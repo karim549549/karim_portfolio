@@ -73,10 +73,11 @@ export default function PageClient() {
         {/* Top Content Area */}
         <div className="pointer-events-auto flex justify-end overflow-hidden">
           <motion.div
+            data-magnetic="true"
             key={`counter-${displayIndex}`}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-anton text-sm md:text-base tracking-widest text-transparent"
+            className="font-anton text-sm md:text-base tracking-widest text-transparent cursor-pointer inline-block"
             style={{ WebkitTextStroke: "1px rgba(255,255,255,0.5)" }}
           >
             0{displayIndex + 1}
@@ -85,16 +86,19 @@ export default function PageClient() {
 
         {/* Bottom Content Area */}
         <div className="pointer-events-auto flex flex-col gap-2 md:gap-4" style={{ perspective: "1000px" }}>
-          <TextGenerateEffect
-            key={displayIndex}
-            words={`${currentText.filled} ${currentText.stroked}`}
-            className="font-anton text-7xl md:text-9xl italic uppercase leading-none"
-          />
+          <div data-magnetic="true" className="w-fit cursor-pointer">
+            <TextGenerateEffect
+              key={displayIndex}
+              words={`${currentText.filled} ${currentText.stroked}`}
+              className="font-anton text-7xl md:text-9xl italic uppercase leading-none"
+            />
+          </div>
           <motion.p
+            data-magnetic="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.5 }}
-            className="text-[10px] md:text-xs text-zinc-500/80 tracking-[0.2em] font-anton italic uppercase"
+            className="text-[10px] w-fit md:text-xs text-zinc-500/80 tracking-[0.2em] font-anton italic uppercase cursor-pointer"
           >
             KARIM &copy; 2026
           </motion.p>

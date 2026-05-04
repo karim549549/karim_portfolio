@@ -24,6 +24,8 @@ export const metadata: Metadata = {
 // Force Static Site Generation (SSG) for the entire app for optimal performance
 export const dynamic = "force-static";
 
+import { MagneticCursor } from "@/components/ui/magnetic-cursor";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,7 +36,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${anton.variable} h-full antialiased`}
     >
-      <body className=" min-h-full flex flex-col">{children}</body>
+      <body className=" min-h-full flex flex-col">
+        <MagneticCursor />
+        {children}
+      </body>
     </html>
   );
 }
