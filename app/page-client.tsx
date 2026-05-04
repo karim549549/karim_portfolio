@@ -70,18 +70,34 @@ export default function PageClient() {
         transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 1 }} // Synchronized with glass card
       >
         
-        {/* Top Content Area (Ready for future portfolio content like nav links) */}
-        <div className="pointer-events-auto flex justify-end">
-          {/* We can add nav links or a logo here later */}
+        {/* Top Content Area */}
+        <div className="pointer-events-auto flex justify-end overflow-hidden">
+          <motion.div
+            key={`counter-${displayIndex}`}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-anton text-sm md:text-base tracking-widest text-transparent"
+            style={{ WebkitTextStroke: "1px rgba(255,255,255,0.5)" }}
+          >
+            0{displayIndex + 1}
+          </motion.div>
         </div>
 
         {/* Bottom Content Area */}
-        <div className="pointer-events-auto" style={{ perspective: "1000px" }}>
+        <div className="pointer-events-auto flex flex-col gap-2 md:gap-4" style={{ perspective: "1000px" }}>
           <TextGenerateEffect
             key={displayIndex}
             words={`${currentText.filled} ${currentText.stroked}`}
             className="font-anton text-7xl md:text-9xl italic uppercase leading-none"
           />
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.5 }}
+            className="text-[10px] md:text-xs text-zinc-500/80 tracking-[0.2em] font-anton italic uppercase"
+          >
+            KARIM &copy; 2026
+          </motion.p>
         </div>
 
       </motion.div>
