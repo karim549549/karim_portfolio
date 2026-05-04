@@ -11,8 +11,12 @@ const texts = [
   { filled: "creative", stroked: "developer" },
 ];
 
+import { SciFiTerminal } from "@/components/ui/sci-fi-terminal";
+import { BookingTerminal } from "@/components/ui/booking-terminal";
+
 export default function PageClient() {
   const [displayIndex, setDisplayIndex] = useState(0);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -71,7 +75,7 @@ export default function PageClient() {
       >
         
         {/* Top Content Area */}
-        <div className="pointer-events-auto flex justify-end overflow-hidden">
+        <div className="pointer-events-auto flex justify-end overflow-hidden z-50">
           <motion.div
             data-magnetic="true"
             key={`counter-${displayIndex}`}
@@ -83,6 +87,21 @@ export default function PageClient() {
             0{displayIndex + 1}
           </motion.div>
         </div>
+
+        {/* Center Content Area */}
+        <SciFiTerminal 
+          className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-[55%]" 
+          onOpenBooking={() => setIsBookingOpen(true)}
+        />
+        
+        {/* Booking Terminal */}
+        {isBookingOpen && (
+          <BookingTerminal 
+            onClose={() => setIsBookingOpen(false)} 
+            className="top-[45%] left-[55%] -translate-x-1/2 -translate-y-1/2"
+          />
+        )}
+
 
         {/* Bottom Content Area */}
         <div className="pointer-events-auto flex flex-col gap-2 md:gap-4" style={{ perspective: "1000px" }}>

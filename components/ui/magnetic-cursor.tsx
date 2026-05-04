@@ -3,56 +3,56 @@
 import React, { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 
+type CursorVariant = "default" | "magnetic" | "terminal";
+
 export function MagneticCursor() {
-  // Custom cursor states
-  const [isHovering, setIsHovering] = useState(false);
+  const [cursorVariant, setCursorVariant] = useState<CursorVariant>("default");
   const [hoverRect, setHoverRect] = useState({ width: 0, height: 0, top: 0, left: 0, radius: 0 });
 
-  // Motion values for precise tracking
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Smooth springs for the cursor follow
-  // We use a tight spring for the default dot so it feels precise
-  const springConfig = isHovering 
-    ? { damping: 20, stiffness: 150, mass: 0.5 } // Softer spring when snapping
-    : { damping: 25, stiffness: 400, mass: 0.2 }; // Snappy spring for free movement
+  const springConfig = cursorVariant === "magnetic" 
+    ? { damping: 20, stiffness: 150, mass: 0.5 }
+    : { damping: 25, stiffness: 400, mass: 0.2 };
 
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Find if we are hovering over a magnetic element
       const target = e.target as HTMLElement;
-      const magneticElement = target.closest('[data-magnetic]') as HTMLElement | null;
+      
+      const terminalElement = target.closest('[data-cursor="terminal"]');
+      const magneticElement = target.closest('[data-magnetic]');
 
-      if (magneticElement) {
-        setIsHovering(true);
+      if (terminalElement) {
+        setCursorVariant("terminal");
+        mouseX.set(e.clientX);
+        mouseY.set(e.clientY);
+      } else if (magneticElement) {
+        setCursorVariant("magnetic");
         const rect = magneticElement.getBoundingClientRect();
         
-        // Calculate the center of the magnetic element
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         
-        // Update motion values to snap to the center
         mouseX.set(centerX);
         mouseY.set(centerY);
 
-        // Try to get computed border radius, otherwise default to a pill/rounded shape
         const computedStyle = window.getComputedStyle(magneticElement);
         let radius = parseInt(computedStyle.borderRadius);
-        if (isNaN(radius)) radius = 12; // default radius
+        if (isNaN(radius)) radius = 12;
 
         setHoverRect({
-          width: rect.width + 24, // add padding
-          height: rect.height + 24, // add padding
+          width: rect.width + 24,
+          height: rect.height + 24,
           top: rect.top,
           left: rect.left,
           radius: radius + 4,
         });
       } else {
-        setIsHovering(false);
+        setCursorVariant("default");
         mouseX.set(e.clientX);
         mouseY.set(e.clientY);
       }
@@ -64,19 +64,39 @@ export function MagneticCursor() {
     };
   }, [mouseX, mouseY]);
 
-  // Default cursor size
-  const defaultSize = 16;
+  const variants = {
+    default: {
+      width: 16,
+      height: 16,
+      borderRadius: "50%",
+      backgroundColor: "#ffffff",
+      border: "0px solid transparent",
+      mixBlendMode: "difference" as const,
+    },
+    magnetic: {
+      width: hoverRect.width,
+      height: hoverRect.height,
+      borderRadius: hoverRect.radius,
+      backgroundColor: "#ffffff",
+      border: "0px solid transparent",
+      mixBlendMode: "difference" as const,
+    },
+    terminal: {
+      width: 32,
+      height: 32,
+      borderRadius: "4px",
+      backgroundColor: "transparent",
+      border: "2px solid rgba(34, 211, 238, 0.8)", // cyan-400
+      mixBlendMode: "normal" as const,
+    }
+  };
 
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[9999] pointer-events-none mix-blend-difference bg-white"
-      initial={{ opacity: 0 }}
-      animate={{ 
-        opacity: 1,
-        width: isHovering ? hoverRect.width : defaultSize,
-        height: isHovering ? hoverRect.height : defaultSize,
-        borderRadius: isHovering ? hoverRect.radius : "50%",
-      }}
+      className="fixed top-0 left-0 z-[9999] pointer-events-none flex items-center justify-center"
+      initial="default"
+      animate={cursorVariant}
+      variants={variants}
       transition={{ type: "spring", damping: 20, stiffness: 150, mass: 0.5 }}
       style={{
         x: cursorX,
@@ -84,6 +104,15 @@ export function MagneticCursor() {
         translateX: "-50%",
         translateY: "-50%",
       }}
-    />
+    >
+      {/* Add a tiny dot in the center for the terminal crosshair effect */}
+      {cursorVariant === "terminal" && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="w-1 h-1 bg-cyan-400 rounded-full" 
+        />
+      )}
+    </motion.div>
   );
 }
